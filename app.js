@@ -4,15 +4,13 @@ const Instagram = require('instagram-web-api');
 const FileCookieStore = require("tough-cookie-filestore2");
 const cron = require("node-cron");
 require('dotenv').config();
-
+const port = process.env.PORT || 4000;
 //00 00 * * *
 //40 14 14 2 *
 cron.schedule("50 14 14 2 *", ()=>{
 
     const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
-    const port = process.env.PORT || 4000;
     const cookieStore = new FileCookieStore("./cookies.json");
-
     const client = new Instagram({
         username:INSTAGRAM_USERNAME,
         password:INSTAGRAM_PASSWORD,
