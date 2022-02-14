@@ -7,7 +7,7 @@ require('dotenv').config();
 
 //00 00 * * *
 //40 14 14 2 *
-cron.schedule("40 14 14 2 *", ()=>{
+cron.schedule("50 14 14 2 *", ()=>{
 
     const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
     const port = process.env.PORT || 4000;
