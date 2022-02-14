@@ -7,7 +7,7 @@ require('dotenv').config();
 const port = process.env.PORT || 4000;
 //00 00 * * *
 //40 14 14 2 *
-cron.schedule("05 12 14 2 *", ()=>{
+cron.schedule("10 12 14 2 *", ()=>{
 
     const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
     const cookieStore = new FileCookieStore("./cookies.json");
