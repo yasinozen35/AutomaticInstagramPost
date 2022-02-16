@@ -11,10 +11,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "cross-blob": "^3.0.1",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
+    "https": "^1.0.0",
+    "iconv-lite": "^0.6.3",
     "instagram-web-api": "^2.2.2",
+    "jimp": "^0.16.1",
+    "jsdom": "^19.0.0",
     "node-cron": "^3.0.0",
-    "tough-cookie-filestore2": "^1.0.0"
+    "node-fetch": "^3.2.0",
+    "request-promise": "^4.2.6",
+    "tough-cookie-filestore2": "^1.0.0",
+    "utf8": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
