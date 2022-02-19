@@ -1,0 +1,79 @@
+html
+  head
+    title= title
+  body
+    div.main
+      div.content
+        h2 Ekle
+        div.formDiv
+          form(action="/add" method="POST")
+            textarea(name="content" cols="30" rows="10" required)
+            input(type="text" name="source" placeholder="Source" required)
+            select(name="subject")
+              option(value="ayet") Ayet
+              option(value="hadis") Hadis
+              option(value="dua") Dua
+            button(type="submit") Ekle
+        h3(class=className)= message
+        img(src=image style="width:100%")
+    div.main
+      div.list
+        ol(type="1")
+          each element in fileArray
+            li.swiper-slide
+              p İçerik: 
+                b #{element.content}
+              p Kaynak:
+                b #{element.source}
+              p Paylaşıldı mı?:
+                b #{element.isPublished ? 'Evet' : 'Hayır'}
+              
+style.
+  .list{
+    max-height:100%;
+    overflow:auto;
+  }
+  li{
+    margin-bottom:40px;
+  }
+  .main{
+    width:50%;
+    float:left;
+  }
+  .content{
+    width: 80%;
+  }
+
+  h2{
+    color:red;
+    margin: 5px;
+  }
+
+  textarea, input, select{
+    width:100%;
+    display:block;
+    border:1px solid #ddd;
+    border-radius:5px;
+    padding:3px;
+    margin-bottom:20px;
+  }
+
+  input, select{
+    height:32px;
+  }
+
+  button{
+    border:1px solid #ddd;
+    border-radius:5px;
+    width:100%;
+    text-align:center;
+    height:32px;
+    cursor:pointer;
+  }
+  .success{
+    color:green;
+  }
+  .error{
+    color:brown;
+  }
+  *:focus { outline: none; }
