@@ -12,22 +12,17 @@ const port = process.env.PORT || 4000;
 app.set('view engine', 'pug')
 //00 00 * * *
 //40 14 14 2 *
-
 const Data = require('./data.js');
-
 let proje = new Data();
-proje.generatePicture('hadis').then(()=>{
-    //console.log(proje.content);
-});
 
 app.get("/add", (req, res)=>{
     const {subject, image} = req.query;
     
     if(subject){
         proje.setSubject(subject);
-        proje.readFile().then(()=>{
+        proje.readFile().then(async()=>{
             if(image){
-                proje.generatePicture()
+                await proje.generatePicture()
             }
             res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', image:proje.imageOut, fileArray:proje.lists.sort((a, b)=> b.created_date - a.created_date) })
         });
@@ -52,8 +47,8 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-cron.schedule("20 12 14 2 *", ()=>{
-
+//cron.schedule("00 04 * * 1/2", ()=>{
+setInterval(()=>{
     const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
     const cookieStore = new FileCookieStore("./cookies.json");
     const client = new Instagram({
@@ -79,35 +74,34 @@ cron.schedule("20 12 14 2 *", ()=>{
     login();
     
     const instagramPostFunction = async () => {
-        await client.uploadPhoto({
-            photo:"./photo.jpg",
-            caption:"#Allah #Muhammet #Kur'an",
-            post:"feed"
-        }).then(async (res)=>{
-            const media = res.media;
-            console.log(`https://instagram.com/p/${media.code}`);
-    
-            await client.addComment({
-                mediaId:media.id,
-                text:'Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!'
+        proje.generatePicture().then(async()=>{
+            
+            await client.uploadPhoto({
+                photo: proje.imageOut,
+                caption:proje.caption,
+                post:"feed"
+            }).then(async (res)=>{
+                const media = res.media;
+                console.log(`https://instagram.com/p/${media.code}`);
+                
+                await client.addComment({
+                    mediaId:media.id,
+                    text:'Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!'
+                });
             });
-
-            await client.logout().then(()=>{
-                console.log("Logout success...");
-            }).catch((err)=>{
-                console.log("Logout failed...");
-                console.log(err);
-            });
+            
+        }).catch((err)=>{
+            console.log(err)
         });
     };
-});
+//}, 1000 * 60 * 5);
+}, 1000 * 60 * 60 * 24 * 2);
+//});
 
 app.get('/', function (req, res) {
     console.log(req.query)
     res.send('hello world')
-})
-
-
+});
 
 app.listen(port, ()=>{
    console.log(`Listening on port ${port}...`);
