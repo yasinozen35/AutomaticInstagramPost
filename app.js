@@ -21,9 +21,6 @@ app.get("/add", (req, res)=>{
     if(subject){
         proje.setSubject(subject);
         proje.readFile().then(async()=>{
-            if(image){
-                await proje.generatePicture()
-            }
             res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', image:proje.imageOut, fileArray:proje.lists.sort((a, b)=> b.created_date - a.created_date) })
         });
     }else{
@@ -46,7 +43,14 @@ app.post("/add", async (req, res)=>{
         res.render('index', {...result, fileArray:proje.lists.sort((a, b)=> b.created_date - a.created_date)});
     });
 });
-
+/*
+setInterval(()=>{
+    proje.generatePicture().then(async()=>{
+    }).catch((err)=>{
+        console.log(err)
+    })
+}, 4000)
+*/
 //cron.schedule("00 04 * * 1/2", ()=>{
 setInterval(()=>{
     const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
@@ -75,26 +79,28 @@ setInterval(()=>{
     
     const instagramPostFunction = async () => {
         proje.generatePicture().then(async()=>{
-            
-            await client.uploadPhoto({
-                photo: proje.imageOut,
-                caption:proje.caption,
-                post:"feed"
-            }).then(async (res)=>{
-                const media = res.media;
-                console.log(`https://instagram.com/p/${media.code}`);
-                
-                await client.addComment({
-                    mediaId:media.id,
-                    text:'Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!'
+            setTimeout(async()=>{
+
+                await client.uploadPhoto({
+                    photo: proje.imageOut,
+                    caption:proje.caption,
+                    post:"feed"
+                }).then(async (res)=>{
+                    const media = res.media;
+                    console.log(`https://instagram.com/p/${media.code}`);
+                    
+                    await client.addComment({
+                        mediaId:media.id,
+                        text:'Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!'
+                    });
                 });
-            });
-            
+
+            }, 2000)
         }).catch((err)=>{
             console.log(err)
         });
     };
-//}, 1000 * 60 * 5);
+//}, 1000 * 5);
 }, 1000 * 60 * 60 * 24 * 2);
 //});
 

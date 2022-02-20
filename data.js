@@ -134,12 +134,12 @@ class Data {
     }
 
     findSubject(){
-        if(this.lastPublicSubject == "" || this.lastPublicSubject == "dua"){
-            this.setSubject('ayet');
-        }else if (this.lastPublicSubject == "ayet"){
+        if(this.lastPublicSubject == "" || this.lastPublicSubject == "ayet"){
             this.setSubject('hadis');
-        }else{
+        }else if (this.lastPublicSubject == "hadis"){
             this.setSubject('dua');
+        }else{
+            this.setSubject('ayet');
         }
     }
 
@@ -155,7 +155,6 @@ class Data {
 
         let fileArray = await this.readFile();
         fileArray.sort((a, b)=>{return a.created_date - b.created_date});
- 
         if(fileArray.length>0){
             const findObj = fileArray.find((element) => element["isPublished"] == false);
             if(findObj){
@@ -242,8 +241,6 @@ class Data {
             }
         });
 
-        console.log(this.subject);
-        console.log(mockData);
         await this.saveFile(mockData, []).then(()=>{
             this.clearSendText();
             this.setLastSubjext();
