@@ -51,8 +51,8 @@ setInterval(()=>{
     })
 }, 4000)
 */
-//cron.schedule("00 04 * * 1/2", ()=>{
-setInterval(()=>{
+cron.schedule("00 03 */2 * *", ()=>{
+//setInterval(()=>{
     const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
     const cookieStore = new FileCookieStore("./cookies.json");
     const client = new Instagram({
@@ -101,8 +101,8 @@ setInterval(()=>{
         });
     };
 //}, 1000 * 5);
-}, 1000 * 60 * 60 * 24 * 2);
-//});
+//}, 1000 * 60 * 60 * 24 * 2);
+});
 
 app.get('/', function (req, res) {
     console.log(req.query)
