@@ -45,7 +45,6 @@ app.post("/add", async (req, res)=>{
 });
 setInterval(()=>{
     const moment = require('moment');
-    moment.locale('tr');
     console.log(moment().format("DD MM YYYY HH:mm"))
     
 }, 2000)
