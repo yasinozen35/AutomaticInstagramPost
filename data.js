@@ -96,9 +96,9 @@ class Data {
     }
 
     setTextFileName(){
-        this.subject == 'ayet' ?  this.textFileName = 'ayetler.json' :
-        this.subject == 'hadis' ?  this.textFileName = 'hadisler.json' :
-        this.subject == 'dua' ?  this.textFileName = 'dualar.json' : '';
+        this.subject == 'ayet' ?  this.textFileName = './public/ayetler.json' :
+        this.subject == 'hadis' ?  this.textFileName = './public/hadisler.json' :
+        this.subject == 'dua' ?  this.textFileName = './public/dualar.json' : '';
     }
 
     setImageFileName(){
@@ -147,17 +147,34 @@ class Data {
         this.findSubject();
         if(this.subject == "") return
         await this.getText();
-        await this.addTextToPicture();
+        //await this.addTextToPicture();
     }
 
     async getText(){
         this.setCaption();
 
         let fileArray = await this.readFile();
+
         fileArray.sort((a, b)=>{return a.created_date - b.created_date});
+
+        let day = moment().format("dddd").toLowerCase().toString();
+        let findObj = {};
+        let number = -1;
+
         if(fileArray.length>0){
-            const findObj = fileArray.find((element) => element["isPublished"] == false);
-            if(findObj){
+            fileArray.forEach((item)=>{
+                let cumaTextNumber = stringSimilarity.compareTwoStrings(item.content, day);
+                if(cumaTextNumber > number && day == "cuma" && item.content.includes(day) == true && item.isPublished == false){
+                    number = cumaTextNumber
+                    findObj = item;
+                }
+            })
+
+            if( Object.keys(findObj).length == 0){
+                findObj = fileArray.find((element) => element["isPublished"] == false);
+            } 
+             
+            if(findObj.content.length>0){
                 let {id, created_date, isPublished, publish_date, content, source} = findObj;
 
                 this.sendText.id = id;
@@ -168,6 +185,7 @@ class Data {
                 this.sendText.isPublished = isPublished;
                 this.sendText.publish_date = publish_date;
             }
+            console.log(this.sendText);
         }
     }
 
