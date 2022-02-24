@@ -147,7 +147,7 @@ class Data {
         this.findSubject();
         if(this.subject == "") return
         await this.getText();
-        //await this.addTextToPicture();
+        await this.addTextToPicture();
     }
 
     async getText(){
@@ -185,6 +185,7 @@ class Data {
                 this.sendText.isPublished = isPublished;
                 this.sendText.publish_date = publish_date;
             }
+
             console.log(this.sendText);
         }
     }

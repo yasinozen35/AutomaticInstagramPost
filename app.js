@@ -43,12 +43,7 @@ app.post("/add", async (req, res)=>{
         res.render('index', {...result, fileArray:proje.lists.sort((a, b)=> b.created_date - a.created_date)});
     });
 });
-setInterval(()=>{
-    const moment = require('moment');
-    moment.locale('tr');
-    console.log(moment().format("dddd").toLowerCase().toString())
-    
-}, 2000)
+
 /*
 setInterval(()=>{
     proje.generatePicture().then(async()=>{
@@ -57,6 +52,7 @@ setInterval(()=>{
     })
 }, 2000)
 */
+
 cron.schedule("00 03 * * *", ()=>{
     const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
     const cookieStore = new FileCookieStore("./cookies.json");
