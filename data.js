@@ -134,13 +134,16 @@ class Data {
     }
 
     findSubject(){
-        if(this.lastPublicSubject == "" || this.lastPublicSubject == "ayet"){
-            this.setSubject('hadis');
-        }else if (this.lastPublicSubject == "hadis"){
-            this.setSubject('dua');
-        }else{
-            this.setSubject('ayet');
-        }
+        this.lastPublicSubjectReadFile().then(()=>{
+            if(this.lastPublicSubject == "" || this.lastPublicSubject == "dua"){
+                this.setSubject('ayet');
+            }else if (this.lastPublicSubject == "ayet"){
+                this.setSubject('hadis');
+            }else{
+                this.setSubject('dua');
+            }
+        })
+        console.log(this.subject);
     }
 
     async generatePicture(){
@@ -173,8 +176,8 @@ class Data {
             if( Object.keys(findObj).length == 0){
                 findObj = fileArray.find((element) => element["isPublished"] == false);
             } 
-             
-            if(findObj.content.length>0){
+   
+            if(findObj && findObj.content.length>0){
                 let {id, created_date, isPublished, publish_date, content, source} = findObj;
 
                 this.sendText.id = id;
@@ -202,6 +205,37 @@ class Data {
                     }
                 }
                 this.lists = arrayList;
+                resolve(arrayList);
+            });
+        });
+    }
+
+    lastPublicSubjectSaveFile(value){
+        return new Promise((resolve,reject) => {
+            try{
+                const data = {
+                    lastPost:value
+                }
+                fs.writeFileSync("./public/lastPost.json", JSON.stringify(data));
+                resolve(true);
+            }catch (err) {
+                reject(false);
+            }
+        })
+    }
+
+    lastPublicSubjectReadFile(value){
+        return new Promise(resolve => {
+            fs.readFile("./public/lastPost.json", (err, data) => {
+                let arrayList = [];
+                if (!err){
+                    if(data!=undefined){
+                        Object.values(JSON.parse(data)).forEach((value)=>{
+                            arrayList.push(value);
+                        })
+                    }
+                }
+                this.lastPublicSubject = arrayList[0];
                 resolve(arrayList);
             });
         });
@@ -260,12 +294,14 @@ class Data {
             }
         });
 
-        await this.saveFile(mockData, []).then(()=>{
-            this.clearSendText();
-            this.setLastSubjext();
-        }).catch((err)=>{
-            console.log(err)
-        });
+        this.lastPublicSubjectSaveFile(this.subject).then(async()=>{
+            await this.saveFile(mockData, []).then(()=>{
+                this.clearSendText();
+                this.setLastSubjext();
+            }).catch((err)=>{
+                console.log(err)
+            });
+        })
     }
 
     async saveFile(fileArray, jsonArray) {
