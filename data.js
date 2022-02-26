@@ -134,23 +134,33 @@ class Data {
     }
 
     findSubject(){
-        this.lastPublicSubjectReadFile().then(()=>{
-            if(this.lastPublicSubject == "" || this.lastPublicSubject == "dua"){
-                this.setSubject('ayet');
-            }else if (this.lastPublicSubject == "ayet"){
-                this.setSubject('hadis');
-            }else{
-                this.setSubject('dua');
-            }
-        })
-        console.log(this.subject);
+        return new Promise((resolve,reject) => {
+            this.lastPublicSubjectReadFile().then(()=>{
+                if(this.lastPublicSubject == "" || this.lastPublicSubject == "dua"){
+                    this.setSubject('ayet');
+                }else if (this.lastPublicSubject == "ayet"){
+                    this.setSubject('hadis');
+                }else{
+                    this.setSubject('dua');
+                }
+                resolve(true);
+            }).catch(()=>{
+                reject(false);
+            })
+        });
     }
 
     async generatePicture(){
-        this.findSubject();
+        await this.findSubject();
         if(this.subject == "") return
         await this.getText();
         await this.addTextToPicture();
+    }
+
+    async generateText(){
+        await this.findSubject();
+        if(this.subject == "") return
+        await this.getText();
     }
 
     async getText(){
@@ -189,6 +199,7 @@ class Data {
                 this.sendText.publish_date = publish_date;
             }
 
+            console.log(this.subject);
             console.log(this.sendText);
         }
     }

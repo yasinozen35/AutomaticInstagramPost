@@ -1,0 +1,82 @@
+html
+  head
+    title= "Manuel Post Page"
+  body
+    div.main
+      div.content
+        h2 Manuel İçerik Gönder
+        h3 Sıradaki içerik:
+        
+        b Konu: 
+          p #{subject}
+        b İçerik: 
+          p #{element.content}
+        b Uzunluk:
+          p #{element.content.length}
+        b Kaynak:
+          p #{element.source}
+        b Paylaşıldı mı?:
+          p #{element.isPublished ? 'Evet' : 'Hayır'}
+        div.button
+          a(href="/send?post=true") Gönder!
+              
+              
+style.
+  body{
+    margin:0px;
+    padding:0px;
+    margin-top:50px;
+  }
+  .main{
+    width:50%;
+    margin:0 auto;
+  }
+  .content{
+    width: 100%;
+    margin: 5px;
+  }
+
+  h2{
+    color: #18dcff;
+  }
+
+  h3{
+    color:#ff3f34;
+    margin-bottom:20px;
+  }
+
+  b{
+    color: #3c40c6;
+    font-weight:bold;
+    font-size:18px;
+    margin-bottom:20px;
+    display:flex;
+  }
+
+  p{
+    color: #1e272e;
+    margin:0px;
+    padding:0px;
+    margin-left:5px;
+  }
+  .button{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    text-align: center;
+  }
+  a{
+    background-color: #3ae374;
+    border-radius:10px;
+    padding-top:10px;
+    padding-bottom:10px;
+    padding-left:30px;
+    padding-right:30px;
+    text-decoration: none;
+    color:#000000;
+    font-weight:bold;
+    width: 70px;
+    text-align: center;
+    display:block;
+    font-size:20px;
+  }

@@ -4,6 +4,30 @@
     "source": "Tevbe 9/51",
     "id": 0,
     "created_date": 1645369940,
+    "isPublished": true,
+    "publish_date": 1645874128
+  },
+  {
+    "content": "Allah, kendisinden başka hiçbir ilah bulunmayandır. En güzel isimler O'nundur.",
+    "source": "Tâhâ 20/8",
+    "id": 1,
+    "created_date": 1645874773,
+    "isPublished": false,
+    "publish_date": null
+  },
+  {
+    "content": "Ey Ademoğulları! Her namaz kılacağınız da güzel ve temiz giyinin, yiyin için fakat israf etmeyin. Çünkü Allah israf edenleri sevmez.",
+    "source": "A’râf 7/31",
+    "id": 2,
+    "created_date": 1645874800,
+    "isPublished": false,
+    "publish_date": null
+  },
+  {
+    "content": "Dünya hayatının hâli, ancak gökten indirdiğimiz bir yağmurun hâli gibidir ki, insanların ve hayvanların yedikleri yeryüzü bitkileri onunla yetişip birbirine karışmıştır. Nihayet yeryüzü (o bitkilerle) bütün ziynet ve güzelliklerini alıp süslendiği ve sahipleri de onun üzerine (her türlü tasarrufa) kadir olduklarını sandıkları bir sırada, geceleyin veya güpegündüz ansızın ona emrimiz (afetle) geliverir de, bunları, sanki dün yerinde hiç yokmuş gibi, kökünden yolunmuş bir hâle getiririz. İşte düşünen bir toplum için, âyetleri böyle ayrı ayrı açıklıyoruz.",
+    "source": "Yûnus 10/24",
+    "id": 3,
+    "created_date": 1645874863,
     "isPublished": false,
     "publish_date": null
   }
