@@ -58,6 +58,7 @@ class Data {
 
     setCaption(){
         let captionArray = ["#Allah", "#muhammet", "#muhammed", "#Kuran", "#dua", "#duavakti", "#pray", "#salavat", "#ahlak", "#din", "#islam", "#kul", "#müslüman", "#muslim", "#musluman", "#cami", "#ehlisunnet", "#ibadet", "#ehlisünnet", "#cuma", "#post", "#sure", "#dinisözler", "#ezan", "#türkiye"];
+        this.caption = "";
         let postCaption = [];
         let i = 0;
         while (i < 6) {
