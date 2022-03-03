@@ -182,7 +182,6 @@ class Data {
             text: this.sendText.content + "\n"+ `https://ayethadis.herokuapp.com/public/images/${this.subject}.jpg`
         };
           
-          
         // Sending Email
         mailTransporter.sendMail(mailDetails, (err, data) => {
             if (err) {

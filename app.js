@@ -54,12 +54,7 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-cron.schedule("50 20 03 03 *", async ()=>{
-    await login();
-});
-
 cron.schedule("00 20 * * *", ()=>{
-    proje.sendMail();
     login();
 });
 
@@ -81,7 +76,9 @@ const login = async () => {
     }).catch((err)=>{
         console.log("Login failed...");
         console.log(err);
-        login();
+        setTimeout(()=>{
+            login();
+        }, 2000)
     });
 }
 
@@ -95,16 +92,18 @@ const instagramPostFunction = async () => {
             }).then(async (res)=>{
                 const media = res.media;
                 console.log(`https://instagram.com/p/${media.code}`);
-                proje.sendMail();
+
                 await client.addComment({
                     mediaId:media.id,
                     text:'Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!'
                 });
+
+                proje.sendMail();
+
             }).catch((err)=>{
                 console.log("upload photo err")
-                console.log(err)
-            });;
-
+                console.log(err);
+            });
         }, 1000)
     }).catch((err)=>{
         console.log(err)
