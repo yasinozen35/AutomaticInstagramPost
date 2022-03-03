@@ -54,13 +54,13 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-cron.schedule("46 20 03 03 *", async ()=>{
+cron.schedule("50 20 03 03 *", async ()=>{
     await login();
 });
 
-cron.schedule("00 20 * * *", async ()=>{
+cron.schedule("00 20 * * *", ()=>{
     proje.sendMail();
-    await login();
+    login();
 });
 
 const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
@@ -81,6 +81,7 @@ const login = async () => {
     }).catch((err)=>{
         console.log("Login failed...");
         console.log(err);
+        login();
     });
 }
 
