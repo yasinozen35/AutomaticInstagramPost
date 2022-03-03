@@ -54,8 +54,7 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-cron.schedule("35 20 03 03 *", async ()=>{
-    proje.sendMail();
+cron.schedule("42 20 03 03 *", async ()=>{
     await login();
 });
 
@@ -95,7 +94,7 @@ const instagramPostFunction = async () => {
             }).then(async (res)=>{
                 const media = res.media;
                 console.log(`https://instagram.com/p/${media.code}`);
-                
+                proje.sendMail();
                 await client.addComment({
                     mediaId:media.id,
                     text:'Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!'
