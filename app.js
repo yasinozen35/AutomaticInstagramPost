@@ -54,7 +54,7 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-cron.schedule("42 20 03 03 *", async ()=>{
+cron.schedule("46 20 03 03 *", async ()=>{
     await login();
 });
 
