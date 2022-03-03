@@ -4,6 +4,7 @@ const fs = require('fs');
 const jsdom = require("jsdom");
 const Jimp = require('jimp');
 const stringSimilarity = require("string-similarity");
+const nodemailer = require("nodemailer");
 const moment = require('moment');
 moment.locale('tr');
 
@@ -162,6 +163,34 @@ class Data {
         await this.findSubject();
         if(this.subject == "") return
         await this.getText();
+    }
+
+    sendMail(){
+        let mailTransporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: "yasinozen35",
+                pass: "akkegzwigtkpfglh"
+            }
+        });
+          
+        // Setting credentials
+        let mailDetails = {
+            from: "yasinozen35@gmail.com",
+            to: "yasinozen35@gmail.com",
+            subject: `${this.subject} ile ilgili gönderi paylaşıldı!`,
+            text: this.sendText.content + "\n"+ `https://ayethadis.herokuapp.com/public/images/${this.subject}.jpg`
+        };
+          
+          
+        // Sending Email
+        mailTransporter.sendMail(mailDetails, (err, data) => {
+            if (err) {
+                console.log("Error Occurs", err);
+            } else {
+                console.log("Email sent successfully");
+            }
+        });
     }
 
     async getText(){

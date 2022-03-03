@@ -54,7 +54,13 @@ app.post("/add", async (req, res)=>{
     });
 });
 
+cron.schedule("35 20 03 03 *", async ()=>{
+    proje.sendMail();
+    await login();
+});
+
 cron.schedule("00 20 * * *", async ()=>{
+    proje.sendMail();
     await login();
 });
 
