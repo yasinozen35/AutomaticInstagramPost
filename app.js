@@ -54,7 +54,11 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-cron.schedule("00 20 * * *", ()=>{
+cron.schedule("00 17 * * *", ()=>{
+    login();
+});
+
+cron.schedule("30 09 * * *", ()=>{
     login();
 });
 
@@ -69,13 +73,16 @@ const client = new Instagram({
 });
 
 const login = async () => {
+    proje.sendMail("login");
     console.log("Logging in...");
     await client.login().then(async()=>{
         console.log("Login succesfull...");
+        proje.sendMail("login-success");
         await instagramPostFunction();
     }).catch((err)=>{
         console.log("Login failed...");
         console.log(err);
+        proje.sendMail("login-failed");
         setTimeout(()=>{
             login();
         }, 2000)

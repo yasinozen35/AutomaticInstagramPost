@@ -165,7 +165,7 @@ class Data {
         await this.getText();
     }
 
-    sendMail(){
+    sendMail(data){
         let mailTransporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -173,14 +173,38 @@ class Data {
                 pass: "akkegzwigtkpfglh"
             }
         });
-          
-        // Setting credentials
-        let mailDetails = {
-            from: "yasinozen35@gmail.com",
-            to: "yasinozen35@gmail.com",
-            subject: `${this.subject} ile ilgili gönderi paylaşıldı!`,
-            text: this.sendText.content + "\n"+ `https://ayethadis.herokuapp.com/public/images/${this.subject}.jpg`
-        };
+        
+        let mailDetails = {};
+
+        if(data == "login"){
+            mailDetails = {
+                from: "yasinozen35@gmail.com",
+                to: "yasinozen35@gmail.com",
+                subject:"Login olmaya çalışılıyor.",
+                text: "İnstagram hesabına giriş yapılacak."
+            };
+        }else if(data == "login-success"){
+            mailDetails = {
+                from: "yasinozen35@gmail.com",
+                to: "yasinozen35@gmail.com",
+                subject:"Login olundu!",
+                text: "İnstagram hesabına giriş yapıldı."
+            };
+        }else if(data == "login-failed"){
+            mailDetails = {
+                from: "yasinozen35@gmail.com",
+                to: "yasinozen35@gmail.com",
+                subject:"Login olunamadı!",
+                text: "İnstagram hesabına giriş yapılamadı."
+            };
+        }else{
+            mailDetails = {
+                from: "yasinozen35@gmail.com",
+                to: "yasinozen35@gmail.com",
+                subject: `${this.subject} ile ilgili gönderi paylaşıldı!`,
+                text: this.sendText.content + "\n"+ `https://ayethadis.herokuapp.com/public/images/${this.subject}.jpg`
+            };
+        }
           
         // Sending Email
         mailTransporter.sendMail(mailDetails, (err, data) => {
