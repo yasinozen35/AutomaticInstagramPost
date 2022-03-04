@@ -99,6 +99,31 @@ const instagramPostFunction = async () => {
             }).then(async (res)=>{
                 const media = res.media;
                 console.log(`https://instagram.com/p/${media.code}`);
+                await client.addComment({
+                    mediaId:media.id,
+                    text:`Müsaitseniz yoruma Amin yazar mısınız?🌹
+
+                    Allah'u Ekber 👆
+
+                    Allahümme Salli Ala Seyyidina Muhammedin ve Ala Ali Seyyidina Muhammed (s.a.v) 🌹
+                    .
+                    👉 Dua eder dua bekleriz 👈
+                    __________________________
+
+                    "Hayra vesile olan, hayrı yapan gibidir." (Hadis,Tirmizî)
+
+                    .
+                    #Allah #Kuran
+                    #Müslüman #namaz #Amin
+                    #Kabe #Ezan #muslim
+                    #muhammed #Hzmuhammed
+                    #Hadis #AllahuEkber #Dua #dualar
+                    #Medine #Secde#duavakti #iman
+                    #Hzmuhammedsav #Kuranıkerim #Mekke
+                    #Mevlana #SubhanAllah #ayetler #ayet #allahvargamyok #islamiyet #edep 
+                    #Bismillahirrahmanirrahim #bismillah`
+                });
+
 
                 await client.addComment({
                     mediaId:media.id,
