@@ -99,9 +99,19 @@ const instagramPostFunction = async () => {
             }).then(async (res)=>{
                 const media = res.media;
                 console.log(`https://instagram.com/p/${media.code}`);
+
+                let firstComment = "";
+                if(proje.subject == 'dua'){
+                    firstComment = "Müsaitseniz yoruma Amin yazar mısınız?"
+                }else{
+                    firstComment = "Müsaitseniz yoruma Elhamdülillah yazar mısınız?"
+                }
+
                 await client.addComment({
                     mediaId:media.id,
-                    text:`Müsaitseniz yoruma Amin yazar mısınız?🌹
+                    text:`${firstComment}🌹
+
+                    #Bismillahirrahmanirrahim
 
                     Allah'u Ekber 👆
 
@@ -111,17 +121,11 @@ const instagramPostFunction = async () => {
                     __________________________
 
                     "Hayra vesile olan, hayrı yapan gibidir." (Hadis,Tirmizî)
-
                     .
-                    #Allah #Kuran
-                    #Müslüman #namaz #Amin
-                    #Kabe #Ezan #muslim
-                    #muhammed #Hzmuhammed
-                    #Hadis #AllahuEkber #Dua #dualar
-                    #Medine #Secde#duavakti #iman
-                    #Hzmuhammedsav #Kuranıkerim #Mekke
-                    #Mevlana #SubhanAllah #ayetler #ayet #allahvargamyok #islamiyet #edep 
-                    #Bismillahirrahmanirrahim #bismillah`
+                    #Allah #Kuran #Mevlana
+                    #Müslüman #namaz #Amin #ayet
+                    #Hzmuhammed #Hadis #AllahuEkber 
+                    #Dua #duavakti #Hzmuhammedsav #Kuranıkerim`
                 });
 
 
