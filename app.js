@@ -92,41 +92,43 @@ const login = async () => {
 const instagramPostFunction = async () => {
     proje.generatePicture().then(async()=>{
         setTimeout(async()=>{
+            let firstComment = "";
+
+            if(proje.subject == 'dua'){
+                firstComment = "Müsaitseniz yoruma Amin yazar mısınız?"
+            }else{
+                firstComment = "Müsaitseniz yoruma Elhamdülillah yazar mısınız?"
+            }
+
+            let caption = `${firstComment}🌹
+
+            #Bismillahirrahmanirrahim
+
+            Allah'u Ekber 👆
+
+            Allahümme Salli Ala Seyyidina Muhammedin ve Ala Ali Seyyidina Muhammed (s.a.v) 🌹
+            .
+            👉 Dua eder dua bekleriz 👈
+            __________________________
+
+            "Hayra vesile olan, hayrı yapan gibidir." (Hadis,Tirmizî)
+            .
+            ${proje.caption}
+            Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
+
             await client.uploadPhoto({
                 photo: proje.imageOut,
+                caption,
                 post:"feed"
             }).then(async (res)=>{
                 const media = res.media;
-
                 console.log(`https://instagram.com/p/${media.code}`);
-
                 proje.sendMail();
 
-                let firstComment = "";
-                if(proje.subject == 'dua'){
-                    firstComment = "Müsaitseniz yoruma Amin yazar mısınız?"
-                }else{
-                    firstComment = "Müsaitseniz yoruma Elhamdülillah yazar mısınız?"
-                }
-
-                await client.addComment({
+                /*await client.addComment({
                     mediaId:media.id,
-                    text:`${firstComment}🌹
-
-                    #Bismillahirrahmanirrahim
-
-                    Allah'u Ekber 👆
-
-                    Allahümme Salli Ala Seyyidina Muhammedin ve Ala Ali Seyyidina Muhammed (s.a.v) 🌹
-                    .
-                    👉 Dua eder dua bekleriz 👈
-                    __________________________
-
-                    "Hayra vesile olan, hayrı yapan gibidir." (Hadis,Tirmizî)
-                    .
-                    ${proje.caption}
-                    Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
-                });
+                    text:
+                });*/
 
             }).catch((err)=>{
                 console.log("upload photo err")
