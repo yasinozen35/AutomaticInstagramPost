@@ -98,7 +98,10 @@ const instagramPostFunction = async () => {
                 post:"feed"
             }).then(async (res)=>{
                 const media = res.media;
+
                 console.log(`https://instagram.com/p/${media.code}`);
+
+                proje.sendMail();
 
                 let firstComment = "";
                 if(proje.subject == 'dua'){
@@ -125,16 +128,9 @@ const instagramPostFunction = async () => {
                     #Allah #Kuran #Mevlana
                     #Müslüman #namaz #Amin #ayet
                     #Hzmuhammed #Hadis #AllahuEkber 
-                    #Dua #duavakti #Hzmuhammedsav #Kuranıkerim`
+                    #Dua #duavakti #Hzmuhammedsav #Kuranıkerim
+                    Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
                 });
-
-
-                await client.addComment({
-                    mediaId:media.id,
-                    text:'Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!'
-                });
-
-                proje.sendMail();
 
             }).catch((err)=>{
                 console.log("upload photo err")
