@@ -94,7 +94,6 @@ const instagramPostFunction = async () => {
         setTimeout(async()=>{
             await client.uploadPhoto({
                 photo: proje.imageOut,
-                caption:proje.caption,
                 post:"feed"
             }).then(async (res)=>{
                 const media = res.media;
@@ -125,10 +124,7 @@ const instagramPostFunction = async () => {
 
                     "Hayra vesile olan, hayrı yapan gibidir." (Hadis,Tirmizî)
                     .
-                    #Allah #Kuran #Mevlana
-                    #Müslüman #namaz #Amin #ayet
-                    #Hzmuhammed #Hadis #AllahuEkber 
-                    #Dua #duavakti #Hzmuhammedsav #Kuranıkerim
+                    ${proje.caption}
                     Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
                 });
 

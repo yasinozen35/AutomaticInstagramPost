@@ -58,16 +58,16 @@ class Data {
     }
 
     setCaption(){
-        let captionArray = ["#Allah", "#muhammet", "#muhammed", "#Kuran", "#dua", "#duavakti", "#pray", "#salavat", "#ahlak", "#din", "#islam", "#kul", "#müslüman", "#muslim", "#musluman", "#cami", "#ehlisunnet", "#ibadet", "#ehlisünnet", "#cuma", "#post", "#sure", "#dinisözler", "#ezan", "#türkiye"];
+        let captionArray = ["#namaz","#Amin","#Hzmuhammed","#Hadis","#AllahuEkber","#Hzmuhammedsav","#Müslüman","#Mevlana","#Allah", "#muhammet", "#muhammed", "#Kuran", "#dua", "#duavakti", "#pray", "#salavat", "#ahlak", "#din", "#islam", "#kul", "#müslüman", "#muslim", "#musluman", "#cami", "#ehlisunnet", "#ibadet", "#ehlisünnet", "#cuma", "#post", "#sure", "#dinisözler", "#ezan", "#türkiye"];
         this.caption = "";
         let postCaption = [];
         let i = 0;
-        while (i < 6) {
+        while (i < 15) {
             const randomNumber = Math.floor(Math.random() * captionArray.length);
             if(postCaption.includes(captionArray[randomNumber]) == false){
                 i++;
                 postCaption.push(captionArray[randomNumber])
-                if(i==6){
+                if(i==15){
                     this.caption+=captionArray[randomNumber];
                 }else{
                     this.caption+=captionArray[randomNumber]+" ";
