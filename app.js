@@ -54,13 +54,16 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-cron.schedule("00 17 * * *", ()=>{
+let task = cron.schedule("00 17 * * *", ()=>{
     login();
 });
 
-cron.schedule("30 09 * * *", ()=>{
+let task2 = cron.schedule("30 09 * * *", ()=>{
     login();
 });
+
+task.start();
+task2.start();
 
 const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
 const cookieStore = new FileCookieStore("./cookies.json");
