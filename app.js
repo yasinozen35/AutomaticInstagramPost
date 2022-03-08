@@ -6,7 +6,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/public', express.static('public'))
 const Instagram = require('instagram-web-api');
 const FileCookieStore = require("tough-cookie-filestore2");
-const cron = require("node-cron");
+const Cron = require("croner");
 require('dotenv').config();
 const port = process.env.PORT || 4000;
 app.set('view engine', 'pug')
@@ -54,14 +54,14 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-const setIntervalCustom = ((hours, minute)=>{
-    let date = new Date();
-    date.setHours(hours, minute, 0);
-    return date.getTime() - Date.now();
-})
+Cron("30 12 * * *", () => {
+	login();
+});
 
-if(setIntervalCustom(12,30)>0) setInterval(()=>login(), setIntervalCustom(12,30))
-if(setIntervalCustom(20,30)>0) setInterval(()=>login(), setIntervalCustom(20,30))
+
+Cron("30 20 * * *", () => {
+	login();
+});
 
 const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
 const cookieStore = new FileCookieStore("./cookies.json");

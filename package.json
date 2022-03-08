@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "nodemonConfig": {
@@ -20,6 +20,7 @@
   "dependencies": {
     "body-parser": "^1.19.2",
     "cheerio": "^1.0.0-rc.10",
+    "croner": "^4.2.3",
     "cross-blob": "^3.0.1",
     "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
@@ -33,11 +34,11 @@
     "node-cron": "^3.0.0",
     "node-fetch": "^3.2.0",
     "nodemailer": "^6.7.2",
+    "nodemon": "^2.0.15",
     "pug": "^3.0.2",
     "request-promise": "^4.2.6",
     "string-similarity": "^4.0.4",
     "tough-cookie-filestore2": "^1.0.0",
-    "utf8": "^3.0.0",
-    "nodemon": "^2.0.15"
+    "utf8": "^3.0.0"
   }
 }
