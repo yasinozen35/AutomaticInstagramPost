@@ -55,8 +55,9 @@ app.post("/add", async (req, res)=>{
 });
 
 const setIntervalCustom = ((hours, minute)=>{
-    new Date().setHours(hours, minute, 0);
-    return new Date().getTime() - Date.now();
+    let date = new Date();
+    date.setHours(hours, minute, 0);
+    return date.getTime() - Date.now();
 })
 
 if(setIntervalCustom(12,30)>0) setInterval(()=>login(), setIntervalCustom(12,30))

@@ -4,8 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "docs/*"
+    ],
+    "delay": 1800000
   },
   "keywords": [],
   "author": "",
@@ -30,9 +37,7 @@
     "request-promise": "^4.2.6",
     "string-similarity": "^4.0.4",
     "tough-cookie-filestore2": "^1.0.0",
-    "utf8": "^3.0.0"
-  },
-  "devDependencies": {
+    "utf8": "^3.0.0",
     "nodemon": "^2.0.15"
   }
 }
