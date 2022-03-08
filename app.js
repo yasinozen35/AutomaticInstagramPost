@@ -54,16 +54,13 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-let task = cron.schedule("00 17 * * *", ()=>{
-    login();
-});
+const setIntervalCustom = ((hours, minute)=>{
+    new Date().setHours(hours, minute, 0);
+    return new Date().getTime() - Date.now();
+})
 
-let task2 = cron.schedule("30 09 * * *", ()=>{
-    login();
-});
-
-task.start();
-task2.start();
+if(setIntervalCustom(12,30)>0) setInterval(()=>login(), setIntervalCustom(12,30))
+if(setIntervalCustom(20,30)>0) setInterval(()=>login(), setIntervalCustom(20,30))
 
 const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
 const cookieStore = new FileCookieStore("./cookies.json");
