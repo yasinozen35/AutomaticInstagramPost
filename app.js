@@ -54,15 +54,11 @@ app.post("/add", async (req, res)=>{
     });
 });
 
-Cron("30 12 * * *", () => {
+Cron("30 09 * * *", () => {
 	login();
 });
 
-Cron("43 08 * * *", () => {
-    proje.sendMail();
-})
-
-Cron("30 20 * * *", () => {
+Cron("30 17 * * *", () => {
 	login();
 });
 
