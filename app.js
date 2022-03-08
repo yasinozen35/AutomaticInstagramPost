@@ -58,6 +58,9 @@ Cron("30 12 * * *", () => {
 	login();
 });
 
+Cron("41 08 * * *", () => {
+    proje.sendMail();
+})
 
 Cron("30 20 * * *", () => {
 	login();
