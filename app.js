@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser');
+let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/public', express.static('public'))
@@ -10,10 +10,12 @@ const Cron = require("croner");
 require('dotenv').config();
 const port = process.env.PORT || 4000;
 app.set('view engine', 'pug')
-
+const moment = require('moment');
+moment.locale('tr');
 const Data = require('./data.js');
 
 let proje = new Data();
+proje.dbConnect();
 
 app.get('/send', async (req, res) => {
     if(req.query.post){
@@ -21,18 +23,18 @@ app.get('/send', async (req, res) => {
     }
 
     await proje.generateText().then(()=>{
-        res.render('send', {element:proje.sendText,subject:proje.subject});
+        res.render('send', {element:proje.sendText,subject:proje.lastSubject});
     })
 });
 
-app.get("/add", (req, res)=>{
+app.get("/add", async (req, res)=>{
     const {subject, image} = req.query;
     
     if(subject){
         proje.setSubject(subject);
-        proje.readFile().then(async()=>{
-            res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', image:proje.imageOut, fileArray:proje.lists.sort((a, b)=> b.created_date - a.created_date) })
-        });
+        await proje.getText();
+
+        res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', image:proje.imageOut, moment, fileArray:proje.lists.sort((a, b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) })
     }else{
         res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', fileArray:[]})
     }
@@ -46,15 +48,14 @@ app.post("/add", async (req, res)=>{
     data['source']  = source.trim();
     proje.addContentFromJson(data, subject).then(async (result)=>{
         if(result.className=='success'){
-            await proje.readFile();
+            await proje.getText();
             console.log(proje.lists.at(-1));
         }
-        
-        res.render('index', {...result, fileArray:proje.lists.sort((a, b)=> b.created_date - a.created_date)});
+        res.render('index', {...result, moment, fileArray:proje.lists.sort((a, b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())});
     });
 });
 
-Cron("30 09 * * *", () => {
+Cron("30 06 * * *", () => {
 	login();
 });
 
@@ -94,7 +95,7 @@ const instagramPostFunction = async () => {
         setTimeout(async()=>{
             let firstComment = "";
 
-            if(proje.subject == 'dua'){
+            if(proje.lastSubject == 'dua'){
                 firstComment = "Müsaitseniz yoruma Amin yazar mısınız?"
             }else{
                 firstComment = "Müsaitseniz yoruma Elhamdülillah yazar mısınız?"
@@ -115,7 +116,7 @@ const instagramPostFunction = async () => {
             .
             ${proje.caption}
             Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
-
+            
             await client.uploadPhoto({
                 photo: proje.imageOut,
                 caption,

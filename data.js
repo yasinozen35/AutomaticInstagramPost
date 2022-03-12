@@ -7,27 +7,24 @@ const stringSimilarity = require("string-similarity");
 const nodemailer = require("nodemailer");
 const moment = require('moment');
 moment.locale('tr');
-
+const mongoose = require('mongoose');
+const AyetHadis = require("./dbModel");
+const DataSubject = require("./dbModelSubject");
 class Data {
     constructor(){
-        this.linkler=[];
-        this.link="";
-        this.textFileName="";
         this.subject="";
+        this.lastSubject="";
         this.caption="";
         this.lists=[];
-        this.$=null;
         this.imageSrc="";
         this.imageOut="";
         this.sendText={
             content: "",
             source: "",
             id: null,
-            created_date: null,
-            isPublished: null,
-            publish_date: null
+            createdAt: null,
+            isPublished: null
         };
-        this.lastPublicSubject="";
         this.imageCalc={
             content:{
                 left:0,
@@ -45,16 +42,52 @@ class Data {
                 alignmentX: null,
                 alignmentY: null
             }
-        }
+        };
+        this.connect=false;
     }
 
-    setSubject(subject) {
-        if(subject == 'ayet' || subject == 'hadis' || subject == 'dua'){
-            this.subject = subject;
-            this.setLink();
-            this.setTextFileName();
-            this.setImageFileName();
-        }
+    dbConnect(){
+        mongoose.connect('mongodb+srv://cluster0.wbbwb.mongodb.net/depo?retryWrites=true&w=majority',{ user: 'Portakal123', pass: 'afUouzzvhvbf3SA2', useNewUrlParser: true, useUnifiedTopology: true })
+        const conn = mongoose.connection;
+        conn.on('connected', ()=> {
+            console.log('database is connected successfully');
+            this.connect=true;
+        });
+        conn.on('disconnected',()=>{
+            console.log('database is disconnected successfully');
+            this.connect=false;
+        })
+        conn.on('error', console.error.bind(console, 'connection error:'));
+    }
+
+    addDbItem({content, source}){
+        return new Promise(async (resolve,reject) => {
+            try {
+                if(this.connect){
+                    //await DataSubject({subject:'ayet', lastSubject:'hadis'}).save();
+                    const newItem = new AyetHadis({content, source, isPublished: false, subject:this.subject});
+                    await newItem.save();
+                    resolve({
+                        className:"success",
+                        message:"Başarılı!"
+                    });
+                }else{
+                    console.error("Connect false");
+                    this.dbConnect();
+                    reject({
+                        className:"error",
+                        message:"Db connect hatası!"
+                    });
+                }
+            } catch (error) {
+                console.log("Error");
+                console.log(error);
+                reject({
+                    className:"error",
+                    message:"Hatalı!"
+                });
+            }
+        });
     }
 
     setCaption(){
@@ -75,81 +108,37 @@ class Data {
             }
         }
     }
-
-    setLink(){
-        let params = "";
-        this.subject.toLowerCase() == 'ayet' ? params = "Tagut-ile-ilgili-Ayetler" :
-        this.subject.toLowerCase() == 'hadis' ? params = "Ebu-Cendel-ve-Ebu-Basir" :
-        this.subject.toLowerCase() == 'dua' ? params = "Borcun-odenmesi-icin-Yapilan-Dualar" : "";
-        this.link = `https://sahihhadisler.com/konu/detay/${params}`;
-    }
-
-    async setLinks(){
-        await request(this.link,(err, response, html)=>{
-            if(err && response.statusCode!=200) return
-            this.$ = cheerio.load(html);
-            this.$(".sidebar-menu li").each((i, data)=>{
-                const link = this.$(data).find("a").attr('href');
-                link ? this.linkler.push(link) : null
-            });
-        });
-        console.log(this.linkler)
-        this.setLists()
-    }
-
-    setTextFileName(){
-        this.subject == 'ayet' ?  this.textFileName = './public/ayetler.json' :
-        this.subject == 'hadis' ?  this.textFileName = './public/hadisler.json' :
-        this.subject == 'dua' ?  this.textFileName = './public/dualar.json' : '';
-    }
-
-    setImageFileName(){
-        if(this.subject == 'ayet' || this.subject == 'hadis' || this.subject == 'dua'){
-            this.imageSrc=`./assets/images/source/blank_${this.subject}.jpg`;
-            this.imageOut=`./public/images/${this.subject}.jpg`;
-        }
-    }
-
-    async setLists(){
-        let iframeUrl = "";
-        this.$('iframe').each((index, elm) => {
-            console.log(index)
-            iframeUrl = this.$(elm).attr('src');
-        });
-        const { JSDOM } = jsdom;
-        await request(iframeUrl, {json:true}, (err, response, html)=>{
-            if(err && response.statusCode!=200) return
-            const iframHtml = cheerio.load(html);
-            /*iframHtml("p").each((i,data)=>{
-                console.log(data.text())
-            })*/
-        });
-    }
     
     clearSendText(){
         this.sendText.content = "";
         this.sendText.source = "";
         this.sendText.id = null;
-        this.sendText.created_date =null;
+        this.sendText.createdAt =null;
         this.sendText.isPublished = null;
-        this.sendText.publish_date = null;
     }
 
-    findSubject(){
-        return new Promise((resolve,reject) => {
-            this.lastPublicSubjectReadFile().then(()=>{
-                if(this.lastPublicSubject == "" || this.lastPublicSubject == "dua"){
-                    this.setSubject('ayet');
-                }else if (this.lastPublicSubject == "ayet"){
-                    this.setSubject('hadis');
-                }else{
-                    this.setSubject('dua');
-                }
-                resolve(true);
-            }).catch(()=>{
-                reject(false);
-            })
-        });
+    async findSubject(){
+        let data = await DataSubject.findById("622c7708d078c52b09e53798").exec();
+        this.setSubject(data.subject);
+        this.setLastSubject(data.lastSubject);
+        this.setImageFileName();
+    }
+
+    setSubject(subject) {
+        if(subject == 'ayet' || subject == 'hadis' || subject == 'dua'){
+            this.subject = subject;
+        }
+    }
+
+    setLastSubject(lastSubject){
+        this.lastSubject=lastSubject;
+    }
+
+    setImageFileName(){
+        if(this.lastSubject == 'ayet' || this.lastSubject == 'hadis' || this.lastSubject == 'dua'){
+            this.imageSrc=`./assets/images/source/blank_${this.lastSubject}.jpg`;
+            this.imageOut=`./public/images/${this.lastSubject}.jpg`;
+        }
     }
 
     async generatePicture(){
@@ -218,11 +207,11 @@ class Data {
 
     async getText(){
         this.setCaption();
+        this.lists = await AyetHadis.find({subject:this.subject});
 
-        let fileArray = await this.readFile();
-
-        fileArray.sort((a, b)=>{return a.created_date - b.created_date});
-
+        let fileArray = await AyetHadis.find({subject:this.lastSubject});
+        fileArray.sort((a, b)=>{return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()});
+        
         let day = moment().format("dddd").toLowerCase().toString();
         let findObj = {};
         let number = -1;
@@ -241,77 +230,19 @@ class Data {
             } 
    
             if(findObj && findObj.content.length>0){
-                let {id, created_date, isPublished, publish_date, content, source} = findObj;
+                let {id, createdAt, isPublished, content, source} = findObj;
 
                 this.sendText.id = id;
                 this.sendText.content = content;
                 this.sendText.source = source;
                 
-                this.sendText.created_date = created_date;
+                this.sendText.createdAt = moment(createdAt).format("LLL");
                 this.sendText.isPublished = isPublished;
-                this.sendText.publish_date = publish_date;
             }
 
             console.log(this.subject);
             console.log(this.sendText);
         }
-    }
-
-    readFile(){
-        return new Promise(resolve => {
-            fs.readFile(this.textFileName, (err, data) => {
-                let arrayList = [];
-                if (!err){
-                    if(data!=undefined){
-                        Object.values(JSON.parse(data)).forEach((value)=>{
-                            arrayList.push(value);
-                        })
-                    }
-                }
-                this.lists = arrayList;
-                resolve(arrayList);
-            });
-        });
-    }
-
-    lastPublicSubjectSaveFile(value){
-        return new Promise((resolve,reject) => {
-            try{
-                const data = {
-                    lastPost:value
-                }
-                fs.writeFileSync("./public/lastPost.json", JSON.stringify(data));
-                resolve(true);
-            }catch (err) {
-                reject(false);
-            }
-        })
-    }
-
-    lastPublicSubjectReadFile(value){
-        return new Promise(resolve => {
-            fs.readFile("./public/lastPost.json", (err, data) => {
-                let arrayList = [];
-                if (!err){
-                    if(data!=undefined){
-                        Object.values(JSON.parse(data)).forEach((value)=>{
-                            arrayList.push(value);
-                        })
-                    }
-                }
-                this.lastPublicSubject = arrayList[0];
-                resolve(arrayList);
-            });
-        });
-    }
-
-    textCompare(array, key, text){
-        let compareNumber = 0;
-        array.forEach((element)=>{
-            const comparePoint = stringSimilarity.compareTwoStrings(element[key], text);
-            if(comparePoint > 0.5) compareNumber++
-        })
-        return compareNumber
     }
 
     async addContentFromJson(jsonData, subject){
@@ -323,22 +254,10 @@ class Data {
         
         this.setSubject(subject);
         
-        let fileArray = await this.readFile();
+        this.lists = await AyetHadis.find({subject:this.subject});
 
-        if(this.textCompare(fileArray, "content", jsonData.content) == 0 && jsonData.content.length < 1000){
-            jsonData['id'] = fileArray.length;
-            jsonData['created_date'] = moment().unix();
-            jsonData['isPublished'] = false;
-            jsonData['publish_date'] = null;
-
-            let jsonArray = [];
-            jsonArray.push(jsonData);
-
-            await this.saveFile(fileArray, jsonArray);
-            return {
-                className:"success",
-                message:"Başarılı"
-            }
+        if(this.textCompare(this.lists, "content", jsonData.content) == 0 && jsonData.content.length < 1000){
+            return this.addDbItem(jsonData);
         }else{
             return {
                 className:"error",
@@ -347,37 +266,41 @@ class Data {
         }
     }
 
-    async setPublish(){
-        const fileArray = await this.readFile();
-        let mockData = fileArray;
-        const id = this.sendText.id;
-        mockData.forEach((element)=>{
-            if(element.id == id){
-                element.isPublished = true;
-                element.publish_date =  moment().unix();
-            }
-        });
-
-        this.lastPublicSubjectSaveFile(this.subject).then(async()=>{
-            await this.saveFile(mockData, []).then(()=>{
-                this.clearSendText();
-                this.setLastSubjext();
-            }).catch((err)=>{
-                console.log(err)
-            });
+    textCompare(array, key, text){
+        let compareNumber = 0;
+        array.forEach((element)=>{
+            const comparePoint = stringSimilarity.compareTwoStrings(element[key], text);
+            if(comparePoint > 0.5) compareNumber++
         })
+        return compareNumber
     }
 
-    async saveFile(fileArray, jsonArray) {
-        return new Promise((resolve,reject) => {
-            try{
-                const data = fileArray.concat(jsonArray);
-                fs.writeFileSync(this.textFileName, JSON.stringify(data));
-                resolve(true);
-            }catch (err) {
-                reject(false);
+    addTextToPicture(){
+        return new Promise(async (resolve,reject) => {
+            const image = await Jimp.read(this.imageSrc);
+            const {contentFont, sourceFont} = await this.photoOptions();
+
+            if(this.sendText.content.length>0 && this.sendText.source.length>0){
+                image.print(contentFont, this.imageCalc.content.left, this.imageCalc.content.top, {
+                    text: this.sendText.content,
+                    alignmentX: this.imageCalc.content.alignmentX,
+                    alignmentY: this.imageCalc.content.alignmentY
+                }, this.imageCalc.content.width, this.imageCalc.content.height);
+        
+                image.print(sourceFont, this.imageCalc.source.left, this.imageCalc.source.top, {
+                    text: this.sendText.source,
+                    alignmentX: this.imageCalc.source.alignmentX,
+                    alignmentY: this.imageCalc.source.alignmentY
+                }, this.imageCalc.source.width, this.imageCalc.source.height);
+
+                image.write(this.imageOut);
+                await this.setPublish();
+                resolve();
+            }else{
+                console.log("Konu:", this.subject);
+                reject("Content ve Source Belirlenmedi!");
             }
-        })
+        });
     }
 
     async photoOptions(){
@@ -389,7 +312,7 @@ class Data {
         this.imageCalc.source.alignmentX = Jimp.HORIZONTAL_ALIGN_CENTER;
         this.imageCalc.source.alignmentY = Jimp.VERTICAL_ALIGN_CENTER;
 
-        if(this.subject == 'ayet'){
+        if(this.lastSubject == 'ayet'){
             if(contentSize >= 0 && contentSize <= 99){
                 contentFontSize = 50;
                 this.imageCalc.content.left = 30;
@@ -434,7 +357,7 @@ class Data {
             this.imageCalc.source.alignmentX = Jimp.HORIZONTAL_ALIGN_CENTER;
             sourceFontSize = 45;
             
-        }else if(this.subject == 'hadis'){
+        }else if(this.lastSubject == 'hadis'){
             
             if(contentSize >= 0 && contentSize <= 99){
                 contentFontSize = 45;
@@ -546,8 +469,8 @@ class Data {
             sourceFontSize = 35;
         }
 
-        let contentFontOptns = `assets/fonts/${this.subject}/content/${contentFontSize}/font.fnt`;
-        let sourceFontOptns = `assets/fonts/${this.subject}/source/${sourceFontSize}/font.fnt`;
+        let contentFontOptns = `assets/fonts/${this.lastSubject}/content/${contentFontSize}/font.fnt`;
+        let sourceFontOptns = `assets/fonts/${this.lastSubject}/source/${sourceFontSize}/font.fnt`;
 
         const contentFont = await Jimp.loadFont(contentFontOptns);
         const sourceFont = await Jimp.loadFont(sourceFontOptns);
@@ -558,36 +481,24 @@ class Data {
         }
     }
 
-    setLastSubjext(){
-        this.lastPublicSubject = this.subject;
-    }
-
-    addTextToPicture(){
-        return new Promise(async (resolve,reject) => {
-            const image = await Jimp.read(this.imageSrc);
-            const {contentFont, sourceFont} = await this.photoOptions();
-
-            if(this.sendText.content.length>0 && this.sendText.source.length>0){
-                image.print(contentFont, this.imageCalc.content.left, this.imageCalc.content.top, {
-                    text: this.sendText.content,
-                    alignmentX: this.imageCalc.content.alignmentX,
-                    alignmentY: this.imageCalc.content.alignmentY
-                }, this.imageCalc.content.width, this.imageCalc.content.height);
+    async setPublish(){
         
-                image.print(sourceFont, this.imageCalc.source.left, this.imageCalc.source.top, {
-                    text: this.sendText.source,
-                    alignmentX: this.imageCalc.source.alignmentX,
-                    alignmentY: this.imageCalc.source.alignmentY
-                }, this.imageCalc.source.width, this.imageCalc.source.height);
+        let subjectData = {};
 
-                image.write(this.imageOut);
-                this.setPublish();
-                resolve();
-            }else{
-                console.log("Konu:", this.subject);
-                reject("Content ve Source Belirlenmedi!");
-            }
-        });
+        if(this.lastSubject == 'ayet'){
+            subjectData['subject'] = this.lastSubject
+            subjectData['lastSubject'] = 'hadis'
+        }else if(this.lastSubject == 'hadis'){
+            subjectData['subject'] = this.lastSubject
+            subjectData['lastSubject'] = 'dua'
+        }else {
+            subjectData['subject'] = this.lastSubject
+            subjectData['lastSubject'] = 'ayet'
+        }
+
+        await DataSubject.findByIdAndUpdate("622c7708d078c52b09e53798", subjectData );
+        await AyetHadis.findByIdAndUpdate(this.sendText.id, { isPublished:true } )
+        this.clearSendText();
     }
 };
 
