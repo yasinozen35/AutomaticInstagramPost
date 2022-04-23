@@ -39,6 +39,7 @@
     "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
     "pug": "^3.0.2",
+    "puppeteer": "^13.5.1",
     "request-promise": "^4.2.6",
     "string-similarity": "^4.0.4",
     "tough-cookie-filestore2": "^1.0.0",

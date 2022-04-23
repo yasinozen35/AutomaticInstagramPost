@@ -1,5 +1,3 @@
-const request = require("request-promise");
-const cheerio = require("cheerio");
 const fs = require('fs');
 const jsdom = require("jsdom");
 const Jimp = require('jimp');
@@ -154,7 +152,7 @@ class Data {
         await this.getText();
     }
 
-    sendMail(data){
+    sendMail(data, text){
         let mailTransporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -184,14 +182,21 @@ class Data {
                 from: "yasinozen35@gmail.com",
                 to: "yasinozen35@gmail.com",
                 subject:"Login olunamadı!",
-                text: "İnstagram hesabına giriş yapılamadı."
+                text: "İnstagram hesabına giriş yapılamadı." + text
+            };
+        }else if(data == "upload-photo-failed"){
+            mailDetails = {
+                from: "yasinozen35@gmail.com",
+                to: "yasinozen35@gmail.com",
+                subject:"upload photo err!",
+                text: "upload photo err" + text
             };
         }else{
             mailDetails = {
                 from: "yasinozen35@gmail.com",
                 to: "yasinozen35@gmail.com",
-                subject: `${this.subject} ile ilgili gönderi paylaşıldı!`,
-                text: this.sendText.content + "\n"+ `https://ayethadis.herokuapp.com/public/images/${this.subject}.jpg`
+                subject: `${this.lastSubject} ile ilgili gönderi paylaşıldı!`,
+                text: this.sendText.content + "\n"+ `https://ayethadis.herokuapp.com/public/images/${this.lastSubject}.jpg`
             };
         }
           

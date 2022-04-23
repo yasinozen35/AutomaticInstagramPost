@@ -13,8 +13,20 @@ app.set('view engine', 'pug')
 const moment = require('moment');
 moment.locale('tr');
 const Data = require('./data.js');
+const GetNewsData = require('./GetNewsData.js');
+
+/*
+let news = new GetNewsData();
+news.visitMainPage().then(()=>{
+    console.log("news data");
+    console.log(news.data[0]);
+    login();
+});
+*/
+
 
 let proje = new Data();
+
 proje.dbConnect();
 
 app.get('/send', async (req, res) => {
@@ -56,11 +68,12 @@ app.post("/add", async (req, res)=>{
 });
 
 Cron("30 06 * * *", () => {
-	login();
+	let day = moment().format("dddd").toLowerCase().toString();
+    if(day == 'cuma') login('_ayetHadis');
 });
 
 Cron("30 17 * * *", () => {
-	login();
+	login('_ayetHadis');
 });
 
 const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
@@ -73,72 +86,98 @@ const client = new Instagram({
     language: 'tr-TR'
 });
 
-const login = async () => {
-    proje.sendMail("login");
-    console.log("Logging in...");
+const login = async (user) => {
     await client.login().then(async()=>{
-        console.log("Login succesfull...");
-        proje.sendMail("login-success");
-        await instagramPostFunction();
+        await instagramPostFunction(user);
     }).catch((err)=>{
         console.log("Login failed...");
         console.log(err);
-        proje.sendMail("login-failed");
+        proje.sendMail("login-failed", err);
         setTimeout(()=>{
             login();
         }, 2000)
     });
 }
 
-const instagramPostFunction = async () => {
-    proje.generatePicture().then(async()=>{
-        setTimeout(async()=>{
-            let firstComment = "";
+const instagramPostFunction = async (user) => {
+    if(user == '_ayetHadis'){
+        proje.generatePicture().then(async()=>{
+            setTimeout(async()=>{
+                let firstComment = "";
+    
+                if(proje.lastSubject == 'dua'){
+                    firstComment = "Müsaitseniz yoruma Amin yazar mısınız?"
+                }else{
+                    firstComment = "Müsaitseniz yoruma Elhamdülillah yazar mısınız?"
+                }
+    
+                let caption = `${firstComment}🌹
+    
+                #Bismillahirrahmanirrahim
+    
+                Allah'u Ekber 👆
+    
+                Allahümme Salli Ala Seyyidina Muhammedin ve Ala Ali Seyyidina Muhammed (s.a.v) 🌹
+                .
+                👉 Dua eder dua bekleriz 👈
+                __________________________
+    
+                "Hayra vesile olan, hayrı yapan gibidir." (Hadis,Tirmizî)
+                .
+                ${proje.caption}
+                Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
+                
+                await client.uploadPhoto({
+                    photo: proje.imageOut,
+                    caption,
+                    post:"feed"
+                }).then(async (res)=>{
+                    const media = res.media;
+                    console.log(`https://instagram.com/p/${media.code}`);
 
-            if(proje.lastSubject == 'dua'){
-                firstComment = "Müsaitseniz yoruma Amin yazar mısınız?"
-            }else{
-                firstComment = "Müsaitseniz yoruma Elhamdülillah yazar mısınız?"
-            }
+                    proje.sendMail();
+    
+                    /*await client.addComment({
+                        mediaId:media.id,
+                        text:
+                    });*/
+    
+                }).catch((err)=>{
+                    console.log("upload photo err")
+                    console.log(err);
+                    proje.sendMail("upload-photo-failed", err);
+                });
+            }, 1000)
+        }).catch((err)=>{
+            console.log(err)
+        });
+    }else{
+        let newImage ="./torbali/" + news.data[0].image.replace(".png", ".jpg");
+        
+        console.log(news.data[0].lead)
+        let urlList = newImage.split("/");
+        console.log("./torbali/"+urlList.at(-1))
+        
+        await client.uploadPhoto({
+            photo: "./torbali/"+urlList.at(-1),
+            caption: news.data[0].lead,
+            post:"feed"
+        }).then(async (res)=>{
+            const media = res.media;
+            console.log(`https://instagram.com/p/${media.code}`);
+            proje.sendMail();
 
-            let caption = `${firstComment}🌹
+            /*await client.addComment({
+                mediaId:media.id,
+                text:
+            });*/
 
-            #Bismillahirrahmanirrahim
-
-            Allah'u Ekber 👆
-
-            Allahümme Salli Ala Seyyidina Muhammedin ve Ala Ali Seyyidina Muhammed (s.a.v) 🌹
-            .
-            👉 Dua eder dua bekleriz 👈
-            __________________________
-
-            "Hayra vesile olan, hayrı yapan gibidir." (Hadis,Tirmizî)
-            .
-            ${proje.caption}
-            Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
-            
-            await client.uploadPhoto({
-                photo: proje.imageOut,
-                caption,
-                post:"feed"
-            }).then(async (res)=>{
-                const media = res.media;
-                console.log(`https://instagram.com/p/${media.code}`);
-                proje.sendMail();
-
-                /*await client.addComment({
-                    mediaId:media.id,
-                    text:
-                });*/
-
-            }).catch((err)=>{
-                console.log("upload photo err")
-                console.log(err);
-            });
-        }, 1000)
-    }).catch((err)=>{
-        console.log(err)
-    });
+        }).catch((err)=>{
+            console.log("upload photo err")
+            console.log(err);
+        });
+    }
+    
 };
 
 
