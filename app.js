@@ -30,87 +30,84 @@ let proje = new Data();
 proje.dbConnect();
 
 app.get('/send', async (req, res) => {
-    if(req.query.post){
+    if (req.query.post) {
         await login();
     }
 
-    await proje.generateText().then(()=>{
-        res.render('send', {element:proje.sendText,subject:proje.lastSubject});
+    await proje.generateText().then(() => {
+        res.render('send', { element: proje.sendText, subject: proje.lastSubject });
     })
 });
 
-app.get("/add", async (req, res)=>{
-    const {subject, image} = req.query;
-    
-    if(subject){
+app.get("/add", async (req, res) => {
+    const { subject, image } = req.query;
+
+    if (subject) {
         proje.setSubject(subject);
         await proje.getText();
 
-        res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', image:proje.imageOut, moment, fileArray:proje.lists.sort((a, b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) })
-    }else{
-        res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', fileArray:[]})
+        res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', image: proje.imageOut, moment, fileArray: proje.lists.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) })
+    } else {
+        res.render('index', { title: 'Hey', message: 'Lütfen inputları doldurunuz!', fileArray: [] })
     }
-    
+
 });
 
-app.post("/add", async (req, res)=>{
-    const {content, source, subject} = req.body;
+app.post("/add", async (req, res) => {
+    const { content, source, subject } = req.body;
     let data = {};
     data['content'] = content.trim();
-    data['source']  = source.trim();
-    proje.addContentFromJson(data, subject).then(async (result)=>{
-        if(result.className=='success'){
+    data['source'] = source.trim();
+    proje.addContentFromJson(data, subject).then(async (result) => {
+        if (result.className == 'success') {
             await proje.getText();
             console.log(proje.lists.at(-1));
         }
-        res.render('index', {...result, moment, fileArray:proje.lists.sort((a, b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())});
+        res.render('index', { ...result, moment, fileArray: proje.lists.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) });
     });
 });
 
 Cron("30 06 * * *", () => {
-	let day = moment().format("dddd").toLowerCase().toString();
-    if(day == 'cuma') login('_ayetHadis');
+    let day = moment().format("dddd").toLowerCase().toString();
+    if (day == 'cuma') login('_ayetHadis');
 });
 
 Cron("30 17 * * *", () => {
-	login('_ayetHadis');
+    login('_ayetHadis');
 });
 
 const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
 const cookieStore = new FileCookieStore("./cookies.json");
 const client = new Instagram({
-    username:INSTAGRAM_USERNAME,
-    password:INSTAGRAM_PASSWORD,
+    username: INSTAGRAM_USERNAME,
+    password: INSTAGRAM_PASSWORD,
     cookieStore
 }, {
     language: 'tr-TR'
 });
 
 const login = async (user) => {
-    await client.login().then(async()=>{
+    await client.login().then(async () => {
         await instagramPostFunction(user);
-    }).catch((err)=>{
+    }).catch((err) => {
         console.log("Login failed...");
         console.log(err);
         proje.sendMail("login-failed", err);
-        setTimeout(()=>{
-            login();
-        }, 2000)
     });
 }
 
 const instagramPostFunction = async (user) => {
-    if(user == '_ayetHadis'){
-        proje.generatePicture().then(async()=>{
-            setTimeout(async()=>{
+    if (user == '_ayetHadis') {
+        proje.generatePicture().then(async () => {
+            setTimeout(async () => {
                 let firstComment = "";
-    
-                if(proje.lastSubject == 'dua'){
+
+                if (proje.lastSubject == 'dua') {
                     firstComment = "Müsaitseniz yoruma Amin yazar mısınız?"
-                }else{
+                } else {
                     firstComment = "Müsaitseniz yoruma Elhamdülillah yazar mısınız?"
                 }
-    
+
                 let caption = `${firstComment}🌹
     
                 #Bismillahirrahmanirrahim
@@ -126,43 +123,43 @@ const instagramPostFunction = async (user) => {
                 .
                 ${proje.caption}
                 Yayınlarımızı paylaşarak daha fazla kişiye ulaştıralım inşaAllah!`
-                
+
                 await client.uploadPhoto({
                     photo: proje.imageOut,
                     caption,
-                    post:"feed"
-                }).then(async (res)=>{
+                    post: "feed"
+                }).then(async (res) => {
                     const media = res.media;
                     console.log(`https://instagram.com/p/${media.code}`);
 
                     proje.sendMail();
-    
+
                     /*await client.addComment({
                         mediaId:media.id,
                         text:
                     });*/
-    
-                }).catch((err)=>{
+
+                }).catch((err) => {
                     console.log("upload photo err")
                     console.log(err);
                     proje.sendMail("upload-photo-failed", err);
                 });
             }, 1000)
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log(err)
         });
-    }else{
-        let newImage ="./torbali/" + news.data[0].image.replace(".png", ".jpg");
-        
+    } else {
+        let newImage = "./torbali/" + news.data[0].image.replace(".png", ".jpg");
+
         console.log(news.data[0].lead)
         let urlList = newImage.split("/");
-        console.log("./torbali/"+urlList.at(-1))
-        
+        console.log("./torbali/" + urlList.at(-1))
+
         await client.uploadPhoto({
-            photo: "./torbali/"+urlList.at(-1),
+            photo: "./torbali/" + urlList.at(-1),
             caption: news.data[0].lead,
-            post:"feed"
-        }).then(async (res)=>{
+            post: "feed"
+        }).then(async (res) => {
             const media = res.media;
             console.log(`https://instagram.com/p/${media.code}`);
             proje.sendMail();
@@ -172,15 +169,15 @@ const instagramPostFunction = async (user) => {
                 text:
             });*/
 
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log("upload photo err")
             console.log(err);
         });
     }
-    
+
 };
 
 
-app.listen(port, ()=>{
-   console.log(`Listening on port ${port}...`);
+app.listen(port, () => {
+    console.log(`Listening on port ${port}...`);
 });
