@@ -90,7 +90,7 @@ const login = async (user) => {
     await client.login().then(async () => {
         await instagramPostFunction(user);
     }).catch((err) => {
-        console.log("Login failed...");
+        console.log("Login failed....");
         console.log(err);
         proje.sendMail("login-failed", err);
     });
