@@ -31,7 +31,7 @@ proje.dbConnect();
 
 app.get('/send', async (req, res) => {
     if (req.query.post) {
-        await login();
+        await login("_ayetHadis");
     }
 
     await proje.generateText().then(() => {
@@ -67,6 +67,8 @@ app.post("/add", async (req, res) => {
     });
 });
 
+const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
+
 Cron("30 06 * * *", () => {
     let day = moment().format("dddd").toLowerCase().toString();
     if (day == 'cuma') login('_ayetHadis');
@@ -76,7 +78,7 @@ Cron("30 17 * * *", () => {
     login('_ayetHadis');
 });
 
-const { INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD } = process.env
+
 const cookieStore = new FileCookieStore("./cookies.json");
 const client = new Instagram({
     username: INSTAGRAM_USERNAME,
