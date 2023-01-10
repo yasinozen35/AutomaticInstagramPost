@@ -157,7 +157,7 @@ class Data {
             service: "gmail",
             auth: {
                 user: "yasinozen35",
-                pass: "akkegzwigtkpfglh"
+                pass: "ngrwpfkqktmzjmqi"
             }
         });
         

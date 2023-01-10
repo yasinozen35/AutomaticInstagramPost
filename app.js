@@ -81,8 +81,8 @@ Cron("30 17 * * *", () => {
 
 const cookieStore = new FileCookieStore("./cookies.json");
 const client = new Instagram({
-    username: INSTAGRAM_USERNAME,
-    password: INSTAGRAM_PASSWORD,
+    username: '_ayethadis',
+    password: 'portakal123.',
     cookieStore
 }, {
     language: 'tr-TR'
